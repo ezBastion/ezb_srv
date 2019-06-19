@@ -20,9 +20,8 @@ import (
 	s "strings"
 	"time"
 
+	"github.com/ezbastion/ezb_srv/models"
 	"github.com/ezbastion/ezb_srv/tool"
-
-	"github.com/ezbastion/ezb_srv/model"
 
 	"github.com/gin-gonic/gin"
 	uuid "github.com/satori/go.uuid"
@@ -30,7 +29,7 @@ import (
 )
 
 func StartTrace(c *gin.Context) {
-	var l model.EzbLogs
+	var l models.EzbLogs
 	l.Date = time.Now().UTC()
 	x, _ := uuid.NewV4()
 	l.Xtrack = x.String()
@@ -54,7 +53,7 @@ func StartTrace(c *gin.Context) {
 	c.Writer.Header().Set("X-Track", l.Xtrack)
 	c.Next()
 	tr, _ := c.Get("trace")
-	trace := tr.(model.EzbLogs)
+	trace := tr.(models.EzbLogs)
 	if len(c.Errors) > 0 {
 		logg.Error("end session with error ", c.Errors.Last().Error())
 		trace.Error = c.Errors.Last().Error()

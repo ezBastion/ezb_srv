@@ -35,9 +35,8 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/ezbastion/ezb_srv/model"
-
 	fqdn "github.com/ShowMax/go-fqdn"
+	"github.com/ezbastion/ezb_srv/models"
 )
 
 var exPath string
@@ -47,7 +46,7 @@ func init() {
 	exPath = filepath.Dir(ex)
 }
 
-func CheckConfig(isIntSess bool) (conf model.Configuration, err error) {
+func CheckConfig(isIntSess bool) (conf models.Configuration, err error) {
 	confFile := path.Join(exPath, "conf/config.json")
 	raw, err := ioutil.ReadFile(confFile)
 	if err != nil {
@@ -65,7 +64,7 @@ func CheckFolder(isIntSess bool) {
 	// ex, _ := os.Executable()
 	// exPath = filepath.Dir(ex)
 	// }
-	// var conf model.Configuration
+	// var conf models.Configuration
 	// confFile := path.Join(exPath, "conf/config.json")
 	if _, err := os.Stat(path.Join(exPath, "cert")); os.IsNotExist(err) {
 		err = os.MkdirAll(path.Join(exPath, "cert"), 0600)
@@ -103,7 +102,7 @@ func Setup(isIntSess bool) error {
 	// ex, _ := os.Executable()
 	// exPath = filepath.Dir(ex)
 	// }
-	// var conf model.Configuration
+	// var conf models.Configuration
 	// var err error
 	_fqdn := fqdn.Get()
 	quiet := true
@@ -120,13 +119,14 @@ func Setup(isIntSess bool) error {
 		conf.ServiceFullName = "Easy Bastion"
 		conf.ServiceName = "ezb_srv"
 		// conf.Log = true
-		conf.LogLevel = "warning"
+		// conf.LogLevel = "warning"
 		conf.CaCert = "cert/ca.crt"
 		conf.PrivateKey = "cert/ezb_srv.key"
 		conf.PublicCert = "cert/ezb_srv.crt"
 		conf.EzbPki = "localhost:6000"
 		conf.SAN = []string{_fqdn, hostname}
 	}
+
 	_, fica := os.Stat(path.Join(exPath, conf.CaCert))
 	_, fipriv := os.Stat(path.Join(exPath, conf.PrivateKey))
 	_, fipub := os.Stat(path.Join(exPath, conf.PublicCert))
@@ -185,7 +185,6 @@ func Setup(isIntSess bool) error {
 		ioutil.WriteFile(confFile, c, 0600)
 		log.Println(confFile, " saved.")
 	}
-
 
 	return nil
 }

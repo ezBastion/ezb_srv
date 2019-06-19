@@ -24,16 +24,16 @@ import (
 	s "strings"
 
 	"github.com/ezbastion/ezb_srv/cache"
-	"github.com/ezbastion/ezb_srv/model"
+	"github.com/ezbastion/ezb_srv/models"
 
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
 )
 
-func GetParams(storage cache.Storage, conf *model.Configuration) gin.HandlerFunc {
+func GetParams(storage cache.Storage, conf *models.Configuration) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		tr, _ := c.Get("trace")
-		trace := tr.(model.EzbLogs)
+		trace := tr.(models.EzbLogs)
 		logg := log.WithFields(log.Fields{
 			"middleware": "GetParams",
 			"xtrack":     trace.Xtrack,
@@ -49,7 +49,7 @@ func GetParams(storage cache.Storage, conf *model.Configuration) gin.HandlerFunc
 				actionID = k
 				actionRGX = v
 			}
-			action, err := model.GetAction(storage, conf, actionID)
+			action, err := models.GetAction(storage, conf, actionID)
 			if err != nil {
 				logg.Error(err)
 				c.AbortWithError(http.StatusInternalServerError, errors.New("#V0001"))
@@ -67,7 +67,7 @@ func GetParams(storage cache.Storage, conf *model.Configuration) gin.HandlerFunc
 			/* tags */
 			params["methode"] = s.ToLower(c.Request.Method)
 			usr, _ := c.Get("account")
-			account := usr.(model.EzbAccounts)
+			account := usr.(models.EzbAccounts)
 			params["tokenid"] = account.Name
 			params["version"] = fmt.Sprintf("%d", action.Controllers.Version)
 			params["constant"] = action.Constant

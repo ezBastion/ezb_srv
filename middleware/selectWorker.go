@@ -22,8 +22,7 @@ import (
 	"sort"
 	"time"
 
-	"github.com/ezbastion/ezb_srv/model"
-
+	"github.com/ezbastion/ezb_srv/models"
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
 )
@@ -34,7 +33,7 @@ func init() {
 
 func SelectWorker(c *gin.Context) {
 	tr, _ := c.Get("trace")
-	trace := tr.(model.EzbLogs)
+	trace := tr.(models.EzbLogs)
 	logg := log.WithFields(log.Fields{
 		"middleware": "SelectWorker",
 		"xtrack":     trace.Xtrack,
@@ -43,7 +42,7 @@ func SelectWorker(c *gin.Context) {
 	// routeType := rt.(string)
 	if routeType == "worker" {
 		ac, _ := c.Get("action")
-		action := ac.(model.EzbActions)
+		action := ac.(models.EzbActions)
 		workers := action.Workers
 		nbW := len(workers)
 		if nbW == 0 {
@@ -66,7 +65,7 @@ func SelectWorker(c *gin.Context) {
 			c.Set("trace", trace)
 		}
 		if nbW > 1 {
-			var enableWorkers []model.EzbWorkers
+			var enableWorkers []models.EzbWorkers
 			var keys []int
 			for _, w := range workers {
 				if w.Enable {
@@ -96,7 +95,7 @@ func SelectWorker(c *gin.Context) {
 	c.Next()
 }
 
-func orderBYjobs(keys *[]int, workers *[]model.EzbWorkers) {
+func orderBYjobs(keys *[]int, workers *[]models.EzbWorkers) {
 	var nbj []int
 	for _, _ = range *workers {
 		var j int // w.fqdn /healthcheck/jobs -> j int  goroutine
@@ -106,13 +105,13 @@ func orderBYjobs(keys *[]int, workers *[]model.EzbWorkers) {
 	keys = &nbj
 
 }
-func orderBYload(keys *[]int, workers *[]model.EzbWorkers) {
+func orderBYload(keys *[]int, workers *[]models.EzbWorkers) {
 	sort.Ints(*keys)
 }
-func randomWorker(workers *[]model.EzbWorkers) int {
+func randomWorker(workers *[]models.EzbWorkers) int {
 	return rand.Intn(len(*workers) - 1)
 }
-func orderBYroundrobin(keys *[]int, workers *[]model.EzbWorkers) {
+func orderBYroundrobin(keys *[]int, workers *[]models.EzbWorkers) {
 	sort.Ints(*keys)
 }
 

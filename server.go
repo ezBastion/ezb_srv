@@ -23,12 +23,12 @@ import (
 	"strings"
 	"time"
 
+	"github.com/ezbastion/ezb_db/Middleware"
 	"github.com/ezbastion/ezb_srv/cache"
 	"github.com/ezbastion/ezb_srv/cache/memory"
 	"github.com/ezbastion/ezb_srv/ctrl"
 	"github.com/ezbastion/ezb_srv/middleware"
 	"github.com/ezbastion/ezb_srv/setup"
-	"github.com/ezbastion/ezb_db/Middleware"
 
 	"net/http"
 	"os"
@@ -65,7 +65,7 @@ func mainGin(serverchan *chan bool) {
 	outlog := true
 	gin.DisableConsoleColor()
 	log.SetFormatter(&log.JSONFormatter{})
-	switch conf.LogLevel {
+	switch conf.Logger.LogLevel {
 	case "debug":
 		log.SetLevel(log.DebugLevel)
 		break

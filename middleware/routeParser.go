@@ -22,7 +22,7 @@ import (
 	"strconv"
 	s "strings"
 
-	"github.com/ezbastion/ezb_srv/model"
+	"github.com/ezbastion/ezb_srv/models"
 
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
@@ -31,7 +31,7 @@ import (
 // use cache for sql https://github.com/goenning/go-cache-demo/blob/master/cache/cache.go
 func RouteParser(c *gin.Context) {
 	tr, _ := c.Get("trace")
-	trace := tr.(model.EzbLogs)
+	trace := tr.(models.EzbLogs)
 	logg := log.WithFields(log.Fields{
 		"middleware": "RouteParser",
 		"xtrack":     trace.Xtrack,
@@ -80,9 +80,9 @@ func RouteParser(c *gin.Context) {
 		action := path[3]
 		access := s.ToUpper(c.Request.Method)
 		viewApis, _ := c.Get("ViewApi")
-		ViewApis := viewApis.([]model.ViewApi)
+		ViewApis := viewApis.([]models.ViewApi)
 		apiFound := false
-		var CurrentAction []model.ViewApi
+		var CurrentAction []models.ViewApi
 		for i := range ViewApis {
 			if ViewApis[i].Ctrlver == version {
 				// fmt.Println(version)
@@ -110,7 +110,7 @@ func RouteParser(c *gin.Context) {
 		// fmt.Println(CurrentAction)
 		// c.Set("CurrentAction", CurrentAction)
 		apiPath, _ := c.Get("apiPath")
-		ApiPath := apiPath.([]model.ApiPath)
+		ApiPath := apiPath.([]models.ApiPath)
 		mapping := make(map[int]string)
 		for _, a := range ApiPath {
 			// fmt.Println(a)

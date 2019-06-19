@@ -25,7 +25,7 @@ import (
 	"strings"
 
 	"github.com/ezbastion/ezb_srv/cache"
-	"github.com/ezbastion/ezb_srv/model"
+	"github.com/ezbastion/ezb_srv/models"
 	"github.com/ezbastion/ezb_srv/tool"
 
 	"github.com/gin-gonic/gin"
@@ -35,18 +35,18 @@ import (
 
 func SendAction(c *gin.Context, storage cache.Storage) {
 	ac, _ := c.Get("action")
-	action := ac.(model.EzbActions)
+	action := ac.(models.EzbActions)
 	p, _ := c.Get("params")
 	params := p.(map[string]string)
 	body := params["body"]
 	wk, _ := c.Get("worker")
-	worker := wk.(model.EzbWorkers)
+	worker := wk.(models.EzbWorkers)
 	cf, _ := c.Get("configuration")
-	conf := cf.(*model.Configuration)
+	conf := cf.(*models.Configuration)
 	rawpath := c.Request.URL.EscapedPath()
 	rawquery := c.Request.URL.RawQuery
 	tr, _ := c.Get("trace")
-	trace := tr.(model.EzbLogs)
+	trace := tr.(models.EzbLogs)
 	exPath := c.MustGet("exPath").(string)
 	key := fmt.Sprintf("%x", md5.Sum([]byte(rawpath+rawquery+body)))
 	logg := log.WithFields(log.Fields{
@@ -58,7 +58,7 @@ func SendAction(c *gin.Context, storage cache.Storage) {
 	// var respStruct map[string]interface{}
 	var respStruct interface{}
 	if action.Jobs.Cache > 0 && c.Request.Method == "GET" {
-		response, ok := model.GetResult(storage, key)
+		response, ok := models.GetResult(storage, key)
 		if ok {
 			// log.Info("found")
 			js := strings.NewReader(string(response))
@@ -108,7 +108,7 @@ func SendAction(c *gin.Context, storage cache.Storage) {
 	}
 	// log.Info(resp.Size())
 	if action.Jobs.Cache > 0 && resp.StatusCode() == 200 && c.Request.Method == "GET" {
-		go model.SetResult(storage, resp.Body(), key, action.Jobs.Cache)
+		go models.SetResult(storage, resp.Body(), key, action.Jobs.Cache)
 	}
 	// break
 

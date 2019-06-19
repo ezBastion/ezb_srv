@@ -21,21 +21,20 @@ import (
 	"net/url"
 	"path"
 
-	"github.com/ezbastion/ezb_srv/model"
-
+	"github.com/ezbastion/ezb_srv/models"
 	"github.com/gin-gonic/gin"
 	"github.com/go-resty/resty"
 	log "github.com/sirupsen/logrus"
 )
 
 func GetXtrack(c *gin.Context) {
-	trace := c.MustGet("trace").(model.EzbLogs)
+	trace := c.MustGet("trace").(models.EzbLogs)
 	logg := log.WithFields(log.Fields{
 		"controller": "internal",
 		"xtrack":     trace.Xtrack,
 	})
-	conf := c.MustGet("configuration").(*model.Configuration)
-	worker := c.MustGet("worker").(model.EzbWorkers)
+	conf := c.MustGet("configuration").(*models.Configuration)
+	worker := c.MustGet("worker").(models.EzbWorkers)
 	exPath := c.MustGet("exPath").(string)
 	param := c.MustGet("params").(string)
 	trace.Controller = "internal"
@@ -75,13 +74,13 @@ func GetXtrack(c *gin.Context) {
 }
 
 func GetLog(c *gin.Context) {
-	trace := c.MustGet("trace").(model.EzbLogs)
+	trace := c.MustGet("trace").(models.EzbLogs)
 	logg := log.WithFields(log.Fields{
 		"controller": "internal",
 		"xtrack":     trace.Xtrack,
 	})
-	conf := c.MustGet("configuration").(*model.Configuration)
-	worker := c.MustGet("worker").(model.EzbWorkers)
+	conf := c.MustGet("configuration").(*models.Configuration)
+	worker := c.MustGet("worker").(models.EzbWorkers)
 	exPath := c.MustGet("exPath").(string)
 	param := c.MustGet("params").(string)
 	trace.Controller = "internal"
@@ -121,13 +120,13 @@ func GetLog(c *gin.Context) {
 }
 
 func GetLoad(c *gin.Context) {
-	trace := c.MustGet("trace").(model.EzbLogs)
+	trace := c.MustGet("trace").(models.EzbLogs)
 	logg := log.WithFields(log.Fields{
 		"controller": "internal",
 		"xtrack":     trace.Xtrack,
 	})
-	conf := c.MustGet("configuration").(*model.Configuration)
-	worker := c.MustGet("worker").(model.EzbWorkers)
+	conf := c.MustGet("configuration").(*models.Configuration)
+	worker := c.MustGet("worker").(models.EzbWorkers)
 	exPath := c.MustGet("exPath").(string)
 	trace.Controller = "internal"
 	trace.Action = "getload"
@@ -165,13 +164,13 @@ func GetLoad(c *gin.Context) {
 	}
 }
 func GetJobs(c *gin.Context) {
-	trace := c.MustGet("trace").(model.EzbLogs)
+	trace := c.MustGet("trace").(models.EzbLogs)
 	logg := log.WithFields(log.Fields{
 		"controller": "internal",
 		"xtrack":     trace.Xtrack,
 	})
-	conf := c.MustGet("configuration").(*model.Configuration)
-	worker := c.MustGet("worker").(model.EzbWorkers)
+	conf := c.MustGet("configuration").(*models.Configuration)
+	worker := c.MustGet("worker").(models.EzbWorkers)
 	exPath := c.MustGet("exPath").(string)
 	trace.Controller = "internal"
 	trace.Action = "getjobs"
@@ -216,13 +215,13 @@ type wksScript struct {
 }
 
 func GetScripts(c *gin.Context) {
-	trace := c.MustGet("trace").(model.EzbLogs)
+	trace := c.MustGet("trace").(models.EzbLogs)
 	logg := log.WithFields(log.Fields{
 		"controller": "internal",
 		"xtrack":     trace.Xtrack,
 	})
-	conf := c.MustGet("configuration").(*model.Configuration)
-	worker := c.MustGet("worker").(model.EzbWorkers)
+	conf := c.MustGet("configuration").(*models.Configuration)
+	worker := c.MustGet("worker").(models.EzbWorkers)
 	exPath := c.MustGet("exPath").(string)
 	trace.Controller = "internal"
 	trace.Action = "getscripts"
@@ -261,13 +260,13 @@ func GetScripts(c *gin.Context) {
 }
 
 func GetConf(c *gin.Context) {
-	trace := c.MustGet("trace").(model.EzbLogs)
+	trace := c.MustGet("trace").(models.EzbLogs)
 	logg := log.WithFields(log.Fields{
 		"controller": "internal",
 		"xtrack":     trace.Xtrack,
 	})
-	conf := c.MustGet("configuration").(*model.Configuration)
-	worker := c.MustGet("worker").(model.EzbWorkers)
+	conf := c.MustGet("configuration").(*models.Configuration)
+	worker := c.MustGet("worker").(models.EzbWorkers)
 	exPath := c.MustGet("exPath").(string)
 	trace.Controller = "internal"
 	trace.Action = "getconfig"

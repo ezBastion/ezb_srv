@@ -16,12 +16,11 @@
 package middleware
 
 import (
-	"github.com/ezbastion/ezb_srv/model"
-
+	"github.com/ezbastion/ezb_srv/models"
 	"github.com/gin-gonic/gin"
 )
 
-func LoadConfig(conf *model.Configuration, exPath string) gin.HandlerFunc {
+func LoadConfig(conf *models.Configuration, exPath string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.Set("configuration", conf)
 		c.Set("exPath", exPath)

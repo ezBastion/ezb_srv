@@ -17,11 +17,12 @@ package middleware
 
 import (
 	"errors"
-	"github.com/ezbastion/ezb_srv/cache"
-	"github.com/ezbastion/ezb_srv/model"
 	"net/http"
 	"net/url"
 	s "strings"
+
+	"github.com/ezbastion/ezb_srv/cache"
+	"github.com/ezbastion/ezb_srv/models"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-resty/resty"
@@ -34,10 +35,10 @@ type formAuth struct {
 	Password  string `json:"password" form:"password"`
 }
 
-func InternalWork(storage cache.Storage, conf *model.Configuration) gin.HandlerFunc {
+func InternalWork(storage cache.Storage, conf *models.Configuration) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		tr, _ := c.Get("trace")
-		trace := tr.(model.EzbLogs)
+		trace := tr.(models.EzbLogs)
 		logg := log.WithFields(log.Fields{
 			"middleware": "InternalWork",
 			"xtrack":     trace.Xtrack,
@@ -70,9 +71,9 @@ func InternalWork(storage cache.Storage, conf *model.Configuration) gin.HandlerF
 	}
 }
 
-func authorize(c *gin.Context, storage cache.Storage, conf *model.Configuration) (string, error) {
+func authorize(c *gin.Context, storage cache.Storage, conf *models.Configuration) (string, error) {
 	var EndPoint string
-	trace := c.MustGet("trace").(model.EzbLogs)
+	trace := c.MustGet("trace").(models.EzbLogs)
 	logg := log.WithFields(log.Fields{
 		"middleware": "authorize",
 		"xtrack":     trace.Xtrack,
@@ -84,7 +85,7 @@ func authorize(c *gin.Context, storage cache.Storage, conf *model.Configuration)
 		if tokenid != "" {
 			Username = tokenid
 		}
-		account, err := model.GetAccount(storage, conf, Username)
+		account, err := models.GetAccount(storage, conf, Username)
 		if err != nil {
 
 			logg.Error(err)
@@ -121,7 +122,7 @@ func authorize(c *gin.Context, storage cache.Storage, conf *model.Configuration)
 			return "redirect with formauth to " + EndPoint, nil
 		}
 	} else {
-		stas, err := model.GetStas(storage, conf)
+		stas, err := models.GetStas(storage, conf)
 		if err != nil {
 			logg.Error(err)
 			return "", err

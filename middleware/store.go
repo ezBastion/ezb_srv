@@ -21,18 +21,17 @@ import (
 	"strconv"
 
 	"github.com/ezbastion/ezb_srv/cache"
-	"github.com/ezbastion/ezb_srv/model"
+	"github.com/ezbastion/ezb_srv/models"
 
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
 )
 
-func Store(storage cache.Storage, conf *model.Configuration) gin.HandlerFunc {
+func Store(storage cache.Storage, conf *models.Configuration) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		
 
 		tr, _ := c.Get("trace")
-		trace := tr.(model.EzbLogs)
+		trace := tr.(models.EzbLogs)
 		logg := log.WithFields(log.Fields{
 			"middleware": "store",
 			"xtrack":     trace.Xtrack,
@@ -40,8 +39,8 @@ func Store(storage cache.Storage, conf *model.Configuration) gin.HandlerFunc {
 		routeType, _ := c.MustGet("routeType").(string)
 		if routeType == "worker" {
 			usr, _ := c.Get("account")
-			account := usr.(model.EzbAccounts)
-			viewApi, err := model.GetViewApi(storage, conf, account.Name, trace.Xtrack)
+			account := usr.(models.EzbAccounts)
+			viewApi, err := models.GetViewApi(storage, conf, account.Name, trace.Xtrack)
 			if err != nil {
 				logg.Error(err)
 				c.AbortWithError(http.StatusInternalServerError, errors.New("#S0001"))
@@ -54,7 +53,7 @@ func Store(storage cache.Storage, conf *model.Configuration) gin.HandlerFunc {
 			}
 			c.Set("ViewApi", viewApi)
 
-			apiPath, err := model.GetApiPath(storage, conf)
+			apiPath, err := models.GetApiPath(storage, conf)
 			if err != nil {
 				logg.Error(err)
 				c.AbortWithError(http.StatusInternalServerError, errors.New("#S0003"))
@@ -66,13 +65,13 @@ func Store(storage cache.Storage, conf *model.Configuration) gin.HandlerFunc {
 				return
 			}
 			c.Set("apiPath", apiPath)
-			
+
 		}
 		if routeType == "internal" {
 			w, _ := c.MustGet("wksid").(string)
 			wksid, _ := strconv.Atoi(w)
-			workers, err := model.GetWorkers(storage, conf)
-			var worker model.EzbWorkers
+			workers, err := models.GetWorkers(storage, conf)
+			var worker models.EzbWorkers
 			if err != nil {
 				logg.Error(err)
 				c.AbortWithError(http.StatusInternalServerError, errors.New("#S0005"))
@@ -97,5 +96,3 @@ func Store(storage cache.Storage, conf *model.Configuration) gin.HandlerFunc {
 		c.Next()
 	}
 }
-
-

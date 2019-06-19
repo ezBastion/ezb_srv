@@ -20,24 +20,23 @@ import (
 	"fmt"
 	"path"
 
-	"github.com/ezbastion/ezb_srv/model"
-
+	"github.com/ezbastion/ezb_srv/models"
 	"github.com/gin-gonic/gin"
 	"github.com/go-resty/resty"
 )
 
-func Trace(l *model.EzbLogs, c *gin.Context) {
+func Trace(l *models.EzbLogs, c *gin.Context) {
 
 	go func() {
 		ep, _ := c.Get("exPath")
 		exPath := ep.(string)
 		cnf, _ := c.Get("configuration")
-		conf := cnf.(*model.Configuration)
+		conf := cnf.(*models.Configuration)
 		fcert := path.Join(exPath, conf.PublicCert)
 		key := path.Join(exPath, conf.PrivateKey)
 		ca := path.Join(exPath, conf.CaCert)
 
-		var log model.EzbLogs
+		var log models.EzbLogs
 		cert, err := tls.LoadX509KeyPair(fcert, key)
 		if err != nil {
 			fmt.Println(err)
@@ -67,18 +66,18 @@ func Trace(l *model.EzbLogs, c *gin.Context) {
 
 }
 
-func IncRequest(l *model.EzbWorkers, c *gin.Context) {
+func IncRequest(l *models.EzbWorkers, c *gin.Context) {
 
 	go func() {
 		ep, _ := c.Get("exPath")
 		exPath := ep.(string)
 		cnf, _ := c.Get("configuration")
-		conf := cnf.(*model.Configuration)
+		conf := cnf.(*models.Configuration)
 		fcert := path.Join(exPath, conf.PublicCert)
 		key := path.Join(exPath, conf.PrivateKey)
 		ca := path.Join(exPath, conf.CaCert)
 
-		var wks model.EzbWorkers
+		var wks models.EzbWorkers
 		cert, err := tls.LoadX509KeyPair(fcert, key)
 		if err != nil {
 			fmt.Println(err)
