@@ -9,7 +9,7 @@
 - Add windows file info
 
 ## 0.1.2 - 2019-05-26
-Move to AGPLv33 opensource.
+Move to AGPLv3 opensource.
 
 ## 0.1.1 - 2019-01-07
 Fisrt public release
