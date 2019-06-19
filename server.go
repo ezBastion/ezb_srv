@@ -32,7 +32,6 @@ import (
 	"net/http"
 	"os"
 	"path"
-	"path/filepath"
 
 	"github.com/gin-gonic/contrib/ginrus"
 	"github.com/gin-gonic/gin"
@@ -40,14 +39,10 @@ import (
 )
 
 var storage cache.Storage
-var exPath string
 
 func mainGin(serverchan *chan bool) {
 
-	ex, _ := os.Executable()
-	exPath = filepath.Dir(ex)
-
-	conf, err := setup.CheckConfig(true)
+	conf, err := setup.CheckConfig()
 	if err != nil {
 		panic(err)
 	}
@@ -90,7 +85,7 @@ func mainGin(serverchan *chan bool) {
 
 	go func() {
 		if err := srv.ListenAndServe(); err != nil {
-			log.Info("listen: %s\n", err)
+			log.Debug("listen: %s\n", err)
 		}
 	}()
 	/* gin */
@@ -98,14 +93,14 @@ func mainGin(serverchan *chan bool) {
 	quit := make(chan os.Signal)
 	signal.Notify(quit, os.Interrupt)
 	<-quit
-	log.Info("Shutdown Server ...")
+	log.Debug("Shutdown Server ...")
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	if err := srv.Shutdown(ctx); err != nil {
 		log.Fatal("Server Shutdown:", err)
 	}
-	log.Info("Server exiting")
+	log.Debug("Server exiting")
 }
 
 func sendAction(c *gin.Context) {
