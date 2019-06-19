@@ -2,7 +2,11 @@
 
 **ATTN**: This project uses [semantic versioning](http://semver.org/).
 
-
+## 0.1.3 - 2019-06-19
+- Fix models namespace
+- Fix logrotate file loc
+- Add icon
+- Add windows file info
 
 ## 0.1.2 - 2019-05-26
 Move to AGPLv33 opensource.
