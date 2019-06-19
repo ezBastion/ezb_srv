@@ -94,16 +94,7 @@ func CheckFolder(isIntSess bool) {
 }
 
 func Setup(isIntSess bool) error {
-	// var exPath string
-	// ServiceName := "ezb_srv"
-	// if isIntSess {
-	// 	exPath = "./"
-	// } else {
-	// ex, _ := os.Executable()
-	// exPath = filepath.Dir(ex)
-	// }
-	// var conf models.Configuration
-	// var err error
+
 	_fqdn := fqdn.Get()
 	quiet := true
 	hostname, _ := os.Hostname()
@@ -114,12 +105,13 @@ func Setup(isIntSess bool) error {
 		quiet = false
 		conf.CacheL1 = 600
 		conf.EzbDB = "https://localhost:8444/"
-		// conf.JwtPubKey = "cert/ezb_sta.crt"
 		conf.Listen = ":5100"
 		conf.ServiceFullName = "Easy Bastion"
 		conf.ServiceName = "ezb_srv"
-		// conf.Log = true
-		// conf.LogLevel = "warning"
+		conf.Logger.LogLevel = "warning"
+		conf.Logger.MaxSize = 10
+		conf.Logger.MaxBackups = 5
+		conf.Logger.MaxAge = 180
 		conf.CaCert = "cert/ca.crt"
 		conf.PrivateKey = "cert/ezb_srv.key"
 		conf.PublicCert = "cert/ezb_srv.crt"

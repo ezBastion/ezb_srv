@@ -17,13 +17,12 @@ package main
 
 import (
 	"context"
-	"fmt"
-	"io"
 	"os/signal"
 	"strings"
 	"time"
 
 	"github.com/ezbastion/ezb_db/Middleware"
+	"github.com/ezbastion/ezb_lib/logmanager"
 	"github.com/ezbastion/ezb_srv/cache"
 	"github.com/ezbastion/ezb_srv/cache/memory"
 	"github.com/ezbastion/ezb_srv/ctrl"
@@ -49,10 +48,10 @@ func mainGin(serverchan *chan bool) {
 	exPath = filepath.Dir(ex)
 
 	conf, err := setup.CheckConfig(true)
-
 	if err != nil {
 		panic(err)
 	}
+	logmanager.SetLogLevel(conf.Logger.LogLevel, exPath, path.Join(exPath, "log/ezb_srv.log"), conf.Logger.MaxSize, conf.Logger.MaxBackups, conf.Logger.MaxAge)
 
 	storage = memory.NewStorage()
 
@@ -61,54 +60,6 @@ func mainGin(serverchan *chan bool) {
 
 	}
 
-	/* log */
-	outlog := true
-	gin.DisableConsoleColor()
-	log.SetFormatter(&log.JSONFormatter{})
-	switch conf.Logger.LogLevel {
-	case "debug":
-		log.SetLevel(log.DebugLevel)
-		break
-	case "info":
-		log.SetLevel(log.InfoLevel)
-		break
-	case "warning":
-		log.SetLevel(log.WarnLevel)
-		break
-	case "error":
-		log.SetLevel(log.ErrorLevel)
-		break
-	case "critical":
-		log.SetLevel(log.FatalLevel)
-		break
-	default:
-		outlog = false
-	}
-	if outlog {
-		if _, err := os.Stat(path.Join(exPath, "log")); os.IsNotExist(err) {
-			err = os.MkdirAll(path.Join(exPath, "log"), 0600)
-			if err != nil {
-				log.Println(err)
-			}
-		}
-		t := time.Now().UTC()
-		l := fmt.Sprintf("log/ezb_srv-%d%d.log", t.Year(), t.YearDay())
-		f, _ := os.OpenFile(path.Join(exPath, l), os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
-		defer f.Close()
-		log.SetOutput(io.MultiWriter(f))
-		ti := time.NewTicker(1 * time.Minute)
-		defer ti.Stop()
-		go func() {
-			for range ti.C {
-				t := time.Now().UTC()
-				l := fmt.Sprintf("log/ezb_srv-%d%d.log", t.Year(), t.YearDay())
-				f, _ := os.OpenFile(path.Join(exPath, l), os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
-				defer f.Close()
-				log.SetOutput(io.MultiWriter(f))
-			}
-		}()
-	}
-	/* log */
 	/* gin */
 	gin.SetMode(gin.ReleaseMode)
 	r := gin.Default()
