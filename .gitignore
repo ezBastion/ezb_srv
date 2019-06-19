@@ -3,3 +3,6 @@
 *.crt
 *.json
 *.log
+*.zip
+*.syso
+*.ico
