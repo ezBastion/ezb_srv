@@ -61,6 +61,7 @@ func AuthJWT(storage cache.Storage, conf *models.Configuration, exPath string) g
 			"middleware": "jwt",
 			"xtrack":     trace.Xtrack,
 		})
+		logg.Debug("start")
 		authHead := c.GetHeader("Authorization")
 		tokenid := c.GetHeader("x-ezb-tokenid")
 

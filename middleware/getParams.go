@@ -38,6 +38,8 @@ func GetParams(storage cache.Storage, conf *models.Configuration) gin.HandlerFun
 			"middleware": "GetParams",
 			"xtrack":     trace.Xtrack,
 		})
+		logg.Debug("start")
+
 		rt, _ := c.Get("routeType")
 		routeType := rt.(string)
 		if routeType == "worker" {
@@ -53,6 +55,7 @@ func GetParams(storage cache.Storage, conf *models.Configuration) gin.HandlerFun
 			if err != nil {
 				logg.Error(err)
 				c.AbortWithError(http.StatusInternalServerError, errors.New("#V0001"))
+				return
 			}
 			params := make(map[string]string)
 			escapedPath := c.Request.URL.EscapedPath()
@@ -71,6 +74,12 @@ func GetParams(storage cache.Storage, conf *models.Configuration) gin.HandlerFun
 			params["tokenid"] = account.Name
 			params["version"] = fmt.Sprintf("%d", action.Controllers.Version)
 			params["constant"] = action.Constant
+			// params["polling"] = strconv.FormatBool(action.Polling)
+			if action.Polling == true && c.Request.Method != "POST" {
+				logg.Error("Polling must use POST methode.")
+				c.AbortWithError(http.StatusBadRequest, errors.New("#V0002"))
+				return
+			}
 			/* query string */
 			query := make(map[string]string)
 			reQ := regexp.MustCompile(`([a-z0-9A-Z-]+)=([si]{1})`)

@@ -2,6 +2,9 @@
 
 **ATTN**: This project uses [semantic versioning](http://semver.org/).
 
+## 0.1.4 - 2019-10-12
+- Add polling support for long tasks
+
 ## 0.1.3 - 2019-06-19
 - Fix models namespace
 - Fix logrotate file loc

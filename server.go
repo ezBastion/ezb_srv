@@ -27,7 +27,9 @@ import (
 	"github.com/ezbastion/ezb_srv/cache/memory"
 	"github.com/ezbastion/ezb_srv/ctrl"
 	"github.com/ezbastion/ezb_srv/middleware"
+	"github.com/ezbastion/ezb_srv/models"
 	"github.com/ezbastion/ezb_srv/setup"
+	"github.com/gin-contrib/location"
 
 	"net/http"
 	"os"
@@ -60,6 +62,9 @@ func mainGin(serverchan *chan bool) {
 	r := gin.Default()
 	r.Use(ginrus.Ginrus(log.StandardLogger(), time.RFC3339, true))
 	r.Use(Middleware.AddHeaders)
+	r.OPTIONS("*a", func(c *gin.Context) {
+		c.AbortWithStatus(200)
+	})
 	r.Use(middleware.LoadConfig(&conf, exPath))
 	r.Use(middleware.StartTrace)
 	r.Use(middleware.InternalWork(storage, &conf))
@@ -68,9 +73,7 @@ func mainGin(serverchan *chan bool) {
 	r.Use(middleware.RouteParser)
 	r.Use(middleware.GetParams(storage, &conf))
 	r.Use(middleware.SelectWorker)
-	r.OPTIONS("*a", func(c *gin.Context) {
-		c.AbortWithStatus(200)
-	})
+	r.Use(location.Default())
 	r.GET("*a", sendAction)
 	r.POST("*a", sendAction)
 	r.PUT("*a", sendAction)
@@ -108,13 +111,21 @@ func sendAction(c *gin.Context) {
 	escapedPath := c.Request.URL.EscapedPath()
 	path := strings.Split(escapedPath, "/")
 	routeType := c.MustGet("routeType").(string)
+	log.Debug("sendAction routeType: ", routeType)
 	switch routeType {
 	case "worker":
 		ctrl.SendAction(c, storage)
 		break
 	case "internal":
+		account := c.MustGet("account").(models.EzbAccounts)
+		if account.Name == "anonymous" {
+			c.JSON(401, "MUST LOGIN")
+			return
+		}
+
 		action := path[3]
 		cmd := path[4]
+		log.Debug("sendAction internal  action:", action, " cmd:", cmd)
 		switch action {
 		case "log":
 			switch cmd {
@@ -144,6 +155,8 @@ func sendAction(c *gin.Context) {
 			break
 		}
 		break
-
+	case "tasks":
+		ctrl.GetTask(c)
+		break
 	}
 }

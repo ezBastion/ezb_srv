@@ -43,29 +43,57 @@ func InternalWork(storage cache.Storage, conf *models.Configuration) gin.Handler
 			"middleware": "InternalWork",
 			"xtrack":     trace.Xtrack,
 		})
-
+		logg.Debug("start")
 		escapedPath := c.Request.URL.EscapedPath()
 		path := s.Split(escapedPath, "/")
 		// sver := path[1]
 		if len(path) == 2 && path[1] == "authorize" {
+			logg.Debug("routeType: authorize")
 			c.Set("routeType", "authorize")
 			ret, err := authorize(c, storage, conf)
 			if err != nil {
 				logg.Error(err)
 				c.AbortWithError(http.StatusInternalServerError, errors.New("#I0001"))
+				return
 			} else {
 				trace.Controller = "internal"
 				trace.Action = "authorize"
 				logg.Info(ret)
 			}
-		} else if path[1] == "wks" {
+		}
+		switch path[1] {
+		case "wks":
+			logg.Debug("routeType: internal")
 			c.Set("routeType", "internal")
 			// trace.Action = "wks"
 			wksid := path[2]
 			c.Set("wksid", wksid)
-		} else {
+			break
+		case "tasks":
+			if len(path) == 4 {
+				logg.Debug("routeType: tasks")
+				c.Set("routeType", "tasks")
+				c.Set("tasksid", path[2])
+				c.Set("tasksaction", path[3])
+			} else {
+				logg.Error("bad task path url")
+				c.AbortWithError(http.StatusBadRequest, errors.New("#I0002"))
+			}
+			break
+		default:
+			logg.Debug("routeType: worker")
 			c.Set("routeType", "worker")
 		}
+		// if path[1] == "wks" {
+		// 	logg.Debug("routeType: internal")
+		// 	c.Set("routeType", "internal")
+		// 	// trace.Action = "wks"
+		// 	wksid := path[2]
+		// 	c.Set("wksid", wksid)
+		// } else {
+		// 	logg.Debug("routeType: worker")
+		// 	c.Set("routeType", "worker")
+		// }
 		c.Set("trace", trace)
 		c.Next()
 	}

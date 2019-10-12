@@ -22,11 +22,13 @@ import (
 	"fmt"
 	"net/url"
 	"path"
+	"strconv"
 	"strings"
 
 	"github.com/ezbastion/ezb_srv/cache"
 	"github.com/ezbastion/ezb_srv/models"
 	"github.com/ezbastion/ezb_srv/tool"
+	"github.com/gin-contrib/location"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-resty/resty"
@@ -48,11 +50,14 @@ func SendAction(c *gin.Context, storage cache.Storage) {
 	tr, _ := c.Get("trace")
 	trace := tr.(models.EzbLogs)
 	exPath := c.MustGet("exPath").(string)
+	tokenid := c.MustGet("tokenid").(string)
 	key := fmt.Sprintf("%x", md5.Sum([]byte(rawpath+rawquery+body)))
 	logg := log.WithFields(log.Fields{
 		"controller": "worker",
 		"xtrack":     trace.Xtrack,
 	})
+	logg.Debug("start")
+
 	// worker.Request++
 	tool.IncRequest(&worker, c)
 	// var respStruct map[string]interface{}
@@ -66,7 +71,6 @@ func SendAction(c *gin.Context, storage cache.Storage) {
 			// respStruct["xtrack"] = trace.Xtrack
 			c.JSON(200, respStruct)
 			return
-			// break
 		}
 		// log.Info("not found")
 	}
@@ -91,6 +95,8 @@ func SendAction(c *gin.Context, storage cache.Storage) {
 	resp, err := resty.R().
 		SetHeader("Accept", "application/json").
 		SetHeader("X-Track", trace.Xtrack).
+		SetHeader("X-Polling", strconv.FormatBool(action.Polling)).
+		SetHeader("x-ezb-tokenid", tokenid).
 		SetBody(&params).
 		SetResult(&respStruct).
 		Post(Url.String())
@@ -102,7 +108,20 @@ func SendAction(c *gin.Context, storage cache.Storage) {
 		// break
 	}
 	if resp.StatusCode() < 300 {
-		c.JSON(resp.StatusCode(), respStruct)
+		var task models.EzbTasks
+		err = json.Unmarshal(resp.Body(), &task)
+		if action.Polling == true && err == nil {
+			u := location.Get(c)
+			logg.Debug("respStruct is models.EzbTasks")
+			Location := fmt.Sprintf("%s://%s/tasks/%04d%s/status", u.Scheme, u.Host, worker.ID, task.UUID)
+			c.Writer.Header().Set("Location", Location)
+			task.StatusURL = Location
+			task.LogURL = fmt.Sprintf("%s://%s/tasks/%04d%s/log", u.Scheme, u.Host, worker.ID, task.UUID)
+			task.ResultURL = fmt.Sprintf("%s://%s/tasks/%04d%s/result", u.Scheme, u.Host, worker.ID, task.UUID)
+			c.JSON(201, task)
+		} else {
+			c.JSON(resp.StatusCode(), respStruct)
+		}
 	} else {
 		c.JSON(resp.StatusCode(), resp.String())
 	}

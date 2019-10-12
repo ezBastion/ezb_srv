@@ -38,6 +38,8 @@ func SelectWorker(c *gin.Context) {
 		"middleware": "SelectWorker",
 		"xtrack":     trace.Xtrack,
 	})
+	logg.Debug("start")
+
 	routeType, _ := c.MustGet("routeType").(string)
 	// routeType := rt.(string)
 	if routeType == "worker" {
