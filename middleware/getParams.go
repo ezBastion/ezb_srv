@@ -134,8 +134,7 @@ func GetParams(storage cache.Storage, conf *models.Configuration) gin.HandlerFun
 			}
 			/* body */
 			/* job */
-			jsJob, _ := json.Marshal(action.Jobs)
-			params["job"] = string(jsJob)
+			c.Set("job", action.Jobs)
 			/* job */
 			c.Set("params", params)
 			// fmt.Println(params)

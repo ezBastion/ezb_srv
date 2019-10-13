@@ -21,3 +21,12 @@ type RestQuery struct {
 	Site       string
 	Query      map[string][]string
 }
+
+type EzbParams struct {
+	Data map[string]string `json:"data"`
+	Meta EzbParamMeta      `json:"meta"`
+}
+
+type EzbParamMeta struct {
+	Job EzbJobs `json:"job"`
+}

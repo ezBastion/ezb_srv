@@ -39,8 +39,8 @@ func SendAction(c *gin.Context, storage cache.Storage) {
 	ac, _ := c.Get("action")
 	action := ac.(models.EzbActions)
 	p, _ := c.Get("params")
-	params := p.(map[string]string)
-	body := params["body"]
+	data := p.(map[string]string)
+	body := data["body"]
 	wk, _ := c.Get("worker")
 	worker := wk.(models.EzbWorkers)
 	cf, _ := c.Get("configuration")
@@ -52,6 +52,12 @@ func SendAction(c *gin.Context, storage cache.Storage) {
 	exPath := c.MustGet("exPath").(string)
 	tokenid := c.MustGet("tokenid").(string)
 	key := fmt.Sprintf("%x", md5.Sum([]byte(rawpath+rawquery+body)))
+	job := c.MustGet("job").(models.EzbJobs)
+	var meta models.EzbParamMeta
+	meta.Job = job
+	var params models.EzbParams
+	params.Data = data
+	params.Meta = meta
 	logg := log.WithFields(log.Fields{
 		"controller": "worker",
 		"xtrack":     trace.Xtrack,
@@ -123,7 +129,7 @@ func SendAction(c *gin.Context, storage cache.Storage) {
 			c.JSON(resp.StatusCode(), respStruct)
 		}
 	} else {
-		c.JSON(resp.StatusCode(), resp.String())
+		c.JSON(resp.StatusCode(), gin.H{"error": resp.String(), "StatusCode": resp.StatusCode()})
 	}
 	// log.Info(resp.Size())
 	if action.Jobs.Cache > 0 && resp.StatusCode() == 200 && c.Request.Method == "GET" {
