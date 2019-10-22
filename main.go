@@ -57,7 +57,7 @@ func main() {
 	}
 	app := cli.NewApp()
 	app.Name = "ezb_srv"
-	app.Version = "0.1.4"
+	app.Version = "0.2.1"
 	app.Usage = "ezBastion frontend server."
 
 	app.Commands = []cli.Command{
