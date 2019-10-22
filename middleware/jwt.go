@@ -64,12 +64,12 @@ func AuthJWT(storage cache.Storage, conf *models.Configuration, exPath string) g
 		logg.Debug("start")
 		authHead := c.GetHeader("Authorization")
 		tokenid := c.GetHeader("x-ezb-tokenid")
-
-		bearer := strings.Split(authHead, " ")
-		if len(bearer) != 2 {
+		logg.Debug("Authorization:", authHead)
+		if authHead == "" {
 			var Account models.EzbAccounts
 			Account.Name = "anonymous"
 			c.Set("account", Account)
+			c.Set("tokenid", "anonymous")
 			tr, ok := c.Get("trace")
 			if ok {
 				trace := tr.(models.EzbLogs)
@@ -81,6 +81,7 @@ func AuthJWT(storage cache.Storage, conf *models.Configuration, exPath string) g
 			c.Next()
 			return
 		}
+		bearer := strings.Split(authHead, " ")
 		if strings.Compare(strings.ToLower(bearer[0]), "bearer") != 0 {
 			logg.Error("NOT AUTHORIZATION TYPE BEARER")
 			c.AbortWithError(http.StatusForbidden, errors.New("#J0002"))

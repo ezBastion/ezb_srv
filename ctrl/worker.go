@@ -36,49 +36,47 @@ import (
 )
 
 func SendAction(c *gin.Context, storage cache.Storage) {
-	ac, _ := c.Get("action")
-	action := ac.(models.EzbActions)
-	p, _ := c.Get("params")
-	data := p.(map[string]string)
-	body := data["body"]
-	wk, _ := c.Get("worker")
-	worker := wk.(models.EzbWorkers)
-	cf, _ := c.Get("configuration")
-	conf := cf.(*models.Configuration)
-	rawpath := c.Request.URL.EscapedPath()
-	rawquery := c.Request.URL.RawQuery
-	tr, _ := c.Get("trace")
-	trace := tr.(models.EzbLogs)
-	exPath := c.MustGet("exPath").(string)
-	tokenid := c.MustGet("tokenid").(string)
-	key := fmt.Sprintf("%x", md5.Sum([]byte(rawpath+rawquery+body)))
-	job := c.MustGet("job").(models.EzbJobs)
-	var meta models.EzbParamMeta
-	meta.Job = job
-	var params models.EzbParams
-	params.Data = data
-	params.Meta = meta
+	trace, ok := c.MustGet("trace").(models.EzbLogs)
+	if !ok {
+		err := "cant read context trace"
+		log.WithFields(log.Fields{"controller": "worker"}).Error(err)
+		c.JSON(500, err)
+		return
+	}
+
 	logg := log.WithFields(log.Fields{
 		"controller": "worker",
 		"xtrack":     trace.Xtrack,
 	})
 	logg.Debug("start")
+	action := c.MustGet("action").(models.EzbActions)
+	exPath := c.MustGet("exPath").(string)
+	tokenid := c.MustGet("tokenid").(string)
+	job := c.MustGet("job").(models.EzbJobs)
+	data := c.MustGet("params").(map[string]string)
+	worker := c.MustGet("worker").(models.EzbWorkers)
+	conf := c.MustGet("configuration").(*models.Configuration)
+	body := data["body"]
+	rawpath := c.Request.URL.EscapedPath()
+	rawquery := c.Request.URL.RawQuery
+	key := fmt.Sprintf("%x", md5.Sum([]byte(rawpath+rawquery+body)))
+	var meta models.EzbParamMeta
+	meta.Job = job
+	var params models.EzbParams
+	params.Data = data
+	params.Meta = meta
 
 	// worker.Request++
 	tool.IncRequest(&worker, c)
-	// var respStruct map[string]interface{}
 	var respStruct interface{}
 	if action.Jobs.Cache > 0 && c.Request.Method == "GET" {
 		response, ok := models.GetResult(storage, key)
 		if ok {
-			// log.Info("found")
 			js := strings.NewReader(string(response))
 			json.NewDecoder(js).Decode(&respStruct)
-			// respStruct["xtrack"] = trace.Xtrack
 			c.JSON(200, respStruct)
 			return
 		}
-		// log.Info("not found")
 	}
 	var Url *url.URL
 	Url, err := url.Parse(worker.Fqdn)
@@ -87,14 +85,12 @@ func SendAction(c *gin.Context, storage cache.Storage) {
 		logg.Error(err)
 		c.JSON(500, err)
 		return
-		// break
 	}
 	cert, err := tls.LoadX509KeyPair(path.Join(exPath, conf.PublicCert), path.Join(exPath, conf.PrivateKey))
 	if err != nil {
 		logg.Error(err)
 		c.JSON(500, err.Error())
 		return
-		// break
 	}
 	resty.SetRootCertificate(path.Join(exPath, conf.CaCert))
 	resty.SetCertificates(cert)
@@ -106,12 +102,10 @@ func SendAction(c *gin.Context, storage cache.Storage) {
 		SetBody(&params).
 		SetResult(&respStruct).
 		Post(Url.String())
-	// trace.Status = resp.Status()
 	if err != nil {
 		logg.Warning(err)
 		c.JSON(resp.StatusCode(), err)
 		return
-		// break
 	}
 	if resp.StatusCode() < 300 {
 		var task models.EzbTasks
@@ -131,10 +125,8 @@ func SendAction(c *gin.Context, storage cache.Storage) {
 	} else {
 		c.JSON(resp.StatusCode(), gin.H{"error": resp.String(), "StatusCode": resp.StatusCode()})
 	}
-	// log.Info(resp.Size())
 	if action.Jobs.Cache > 0 && resp.StatusCode() == 200 && c.Request.Method == "GET" {
 		go models.SetResult(storage, resp.Body(), key, action.Jobs.Cache)
 	}
-	// break
 
 }
