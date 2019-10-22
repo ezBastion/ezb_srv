@@ -108,8 +108,8 @@ func SendAction(c *gin.Context, storage cache.Storage) {
 		Post(Url.String())
 	// trace.Status = resp.Status()
 	if err != nil {
-		logg.Error(err)
-		c.JSON(500, err)
+		logg.Warning(err)
+		c.JSON(resp.StatusCode(), err)
 		return
 		// break
 	}
