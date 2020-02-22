@@ -31,7 +31,7 @@ import (
 	"github.com/gin-contrib/location"
 
 	"github.com/gin-gonic/gin"
-	"github.com/go-resty/resty"
+	"github.com/go-resty/resty/v2"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -92,9 +92,10 @@ func SendAction(c *gin.Context, storage cache.Storage) {
 		c.JSON(500, err.Error())
 		return
 	}
-	resty.SetRootCertificate(path.Join(exPath, conf.CaCert))
-	resty.SetCertificates(cert)
-	resp, err := resty.R().
+	client := resty.New()
+	client.SetRootCertificate(path.Join(exPath, conf.CaCert))
+	client.SetCertificates(cert)
+	resp, err := client.R().
 		SetHeader("Accept", "application/json").
 		SetHeader("X-Track", trace.Xtrack).
 		SetHeader("X-Polling", strconv.FormatBool(action.Polling)).

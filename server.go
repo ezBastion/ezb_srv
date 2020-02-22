@@ -21,7 +21,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ezbastion/ezb_db/Middleware"
 	"github.com/ezbastion/ezb_lib/logmanager"
 	"github.com/ezbastion/ezb_srv/cache"
 	"github.com/ezbastion/ezb_srv/cache/memory"
@@ -48,7 +47,7 @@ func mainGin(serverchan *chan bool) {
 	if err != nil {
 		panic(err)
 	}
-	logmanager.SetLogLevel(conf.Logger.LogLevel, exPath, path.Join(exPath, "log/ezb_srv.log"), conf.Logger.MaxSize, conf.Logger.MaxBackups, conf.Logger.MaxAge)
+	logmanager.SetLogLevel(conf.Logger.LogLevel, exPath, path.Join(exPath, "log/ezb_srv.log"), conf.Logger.MaxSize, conf.Logger.MaxBackups, conf.Logger.MaxAge, true, true, true)
 
 	storage = memory.NewStorage()
 
@@ -61,7 +60,7 @@ func mainGin(serverchan *chan bool) {
 	gin.SetMode(gin.ReleaseMode)
 	r := gin.Default()
 	r.Use(ginrus.Ginrus(log.StandardLogger(), time.RFC3339, true))
-	r.Use(Middleware.AddHeaders)
+	r.Use(middleware.AddHeaders)
 	r.OPTIONS("*a", func(c *gin.Context) {
 		c.AbortWithStatus(200)
 	})

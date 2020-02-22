@@ -26,7 +26,7 @@ import (
 	"github.com/ezbastion/ezb_srv/models"
 	"github.com/gin-contrib/location"
 	"github.com/gin-gonic/gin"
-	"github.com/go-resty/resty"
+	"github.com/go-resty/resty/v2"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -52,6 +52,7 @@ func GetTask(c *gin.Context) {
 		c.JSON(500, err)
 		return
 	}
+
 	cert, err := tls.LoadX509KeyPair(path.Join(exPath, conf.PublicCert), path.Join(exPath, conf.PrivateKey))
 	if err != nil {
 		logg.Error(err)
@@ -86,10 +87,11 @@ func getTaskResult(c *gin.Context, cert tls.Certificate, url, pemFilePath, xtrac
 		"controller": "internal",
 		"xtrack":     xtrack,
 	})
+	client := resty.New()
 
-	resty.SetRootCertificate(pemFilePath)
-	resty.SetCertificates(cert)
-	resp, err := resty.R().
+	client.SetRootCertificate(pemFilePath)
+	client.SetCertificates(cert)
+	resp, err := client.R().
 		SetHeader("Accept", "application/json").
 		SetHeader("X-Track", xtrack).
 		SetHeader("x-ezb-tokenid", tokenID).
@@ -112,9 +114,10 @@ func getTaskStatus(c *gin.Context, cert tls.Certificate, url, pemFilePath, xtrac
 		"xtrack":     xtrack,
 	})
 	var respStruct models.EzbTasks
-	resty.SetRootCertificate(pemFilePath)
-	resty.SetCertificates(cert)
-	resp, err := resty.R().
+	client := resty.New()
+	client.SetRootCertificate(pemFilePath)
+	client.SetCertificates(cert)
+	resp, err := client.R().
 		SetHeader("Accept", "application/json").
 		SetHeader("X-Track", xtrack).
 		SetHeader("x-ezb-tokenid", tokenID).
@@ -142,9 +145,10 @@ func getTaskLog(c *gin.Context, cert tls.Certificate, url, pemFilePath, xtrack, 
 		"controller": "internal",
 		"xtrack":     xtrack,
 	})
-	resty.SetRootCertificate(pemFilePath)
-	resty.SetCertificates(cert)
-	resp, err := resty.R().
+	client := resty.New()
+	client.SetRootCertificate(pemFilePath)
+	client.SetCertificates(cert)
+	resp, err := client.R().
 		SetHeader("X-Track", xtrack).
 		SetHeader("x-ezb-tokenid", tokenID).
 		Get(url)
@@ -188,9 +192,10 @@ func GetXtrack(c *gin.Context) {
 		c.JSON(500, err.Error())
 		return
 	}
-	resty.SetRootCertificate(path.Join(exPath, conf.CaCert))
-	resty.SetCertificates(cert)
-	resp, err := resty.R().
+	client := resty.New()
+	client.SetRootCertificate(path.Join(exPath, conf.CaCert))
+	client.SetCertificates(cert)
+	resp, err := client.R().
 		SetHeader("Accept", "application/json").
 		SetHeader("X-Track", trace.Xtrack).
 		SetResult(&respStruct).
@@ -234,9 +239,10 @@ func GetLog(c *gin.Context) {
 		c.JSON(500, err.Error())
 		return
 	}
-	resty.SetRootCertificate(path.Join(exPath, conf.CaCert))
-	resty.SetCertificates(cert)
-	resp, err := resty.R().
+	client := resty.New()
+	client.SetRootCertificate(path.Join(exPath, conf.CaCert))
+	client.SetCertificates(cert)
+	resp, err := client.R().
 		SetHeader("Accept", "application/json").
 		SetHeader("X-Track", trace.Xtrack).
 		SetResult(&respStruct).
@@ -279,9 +285,10 @@ func GetLoad(c *gin.Context) {
 		c.JSON(500, err.Error())
 		return
 	}
-	resty.SetRootCertificate(path.Join(exPath, conf.CaCert))
-	resty.SetCertificates(cert)
-	resp, err := resty.R().
+	client := resty.New()
+	client.SetRootCertificate(path.Join(exPath, conf.CaCert))
+	client.SetCertificates(cert)
+	resp, err := client.R().
 		SetHeader("Accept", "application/json").
 		SetHeader("X-Track", trace.Xtrack).
 		SetResult(&respStruct).
@@ -323,9 +330,10 @@ func GetJobs(c *gin.Context) {
 		c.JSON(500, err.Error())
 		return
 	}
-	resty.SetRootCertificate(path.Join(exPath, conf.CaCert))
-	resty.SetCertificates(cert)
-	resp, err := resty.R().
+	client := resty.New()
+	client.SetRootCertificate(path.Join(exPath, conf.CaCert))
+	client.SetCertificates(cert)
+	resp, err := client.R().
 		SetHeader("Accept", "application/json").
 		SetHeader("X-Track", trace.Xtrack).
 		SetResult(&respStruct).
@@ -374,9 +382,10 @@ func GetScripts(c *gin.Context) {
 		c.JSON(500, err.Error())
 		return
 	}
-	resty.SetRootCertificate(path.Join(exPath, conf.CaCert))
-	resty.SetCertificates(cert)
-	resp, err := resty.R().
+	client := resty.New()
+	client.SetRootCertificate(path.Join(exPath, conf.CaCert))
+	client.SetCertificates(cert)
+	resp, err := client.R().
 		SetHeader("Accept", "application/json").
 		SetHeader("X-Track", trace.Xtrack).
 		SetResult(&respStruct).
@@ -419,9 +428,10 @@ func GetConf(c *gin.Context) {
 		c.JSON(500, err.Error())
 		return
 	}
-	resty.SetRootCertificate(path.Join(exPath, conf.CaCert))
-	resty.SetCertificates(cert)
-	resp, err := resty.R().
+	client := resty.New()
+	client.SetRootCertificate(path.Join(exPath, conf.CaCert))
+	client.SetCertificates(cert)
+	resp, err := client.R().
 		SetHeader("Accept", "application/json").
 		SetHeader("X-Track", trace.Xtrack).
 		SetResult(&respStruct).

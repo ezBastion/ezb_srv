@@ -109,6 +109,7 @@ func RouteParser(c *gin.Context) {
 			c.AbortWithError(http.StatusForbidden, errors.New("#P0004"))
 			return
 		}
+		logg.Debug("found ", len(CurrentAction), " api matching ver, ctrl, act")
 		// fmt.Println(CurrentAction)
 		// c.Set("CurrentAction", CurrentAction)
 		apiPath, _ := c.Get("apiPath")
@@ -123,6 +124,10 @@ func RouteParser(c *gin.Context) {
 			}
 		}
 		c.Set("apiPath", nil)
+		if len(mapping) == 0 {
+			logg.Error("NO API MATCH ", escapedPath)
+			// TODO: test it
+		}
 		// var matchApiID []int
 		matchApiID := make(map[int]string)
 		for i, rx := range mapping {

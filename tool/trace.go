@@ -22,7 +22,7 @@ import (
 
 	"github.com/ezbastion/ezb_srv/models"
 	"github.com/gin-gonic/gin"
-	"github.com/go-resty/resty"
+	"github.com/go-resty/resty/v2"
 )
 
 func Trace(l *models.EzbLogs, c *gin.Context) {
@@ -42,10 +42,11 @@ func Trace(l *models.EzbLogs, c *gin.Context) {
 			fmt.Println(err)
 			return
 		}
-		resty.SetRootCertificate(ca)
-		resty.SetCertificates(cert)
+		client := resty.New()
+		client.SetRootCertificate(ca)
+		client.SetCertificates(cert)
 		if l.ID == 0 {
-			_, err := resty.R().
+			_, err := client.R().
 				SetBody(l).
 				SetResult(&log).
 				Post(conf.EzbDB + "logs")
@@ -53,7 +54,7 @@ func Trace(l *models.EzbLogs, c *gin.Context) {
 				fmt.Println(err)
 			}
 		} else {
-			_, err := resty.R().
+			_, err := client.R().
 				SetBody(l).
 				SetResult(&log).
 				Put(conf.EzbDB + "logs")
@@ -83,10 +84,11 @@ func IncRequest(l *models.EzbWorkers, c *gin.Context) {
 			fmt.Println(err)
 			return
 		}
-		resty.SetRootCertificate(ca)
-		resty.SetCertificates(cert)
+		client := resty.New()
+		client.SetRootCertificate(ca)
+		client.SetCertificates(cert)
 		if l.ID != 0 {
-			_, err := resty.R().
+			_, err := client.R().
 				SetResult(&wks).
 				Put(fmt.Sprintf("%sworkers/inc/%d", conf.EzbDB, l.ID))
 			if err != nil {

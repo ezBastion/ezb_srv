@@ -31,7 +31,7 @@ import (
 func StartTrace(c *gin.Context) {
 	var l models.EzbLogs
 	l.Date = time.Now().UTC()
-	x, _ := uuid.NewV4()
+	x := uuid.NewV4()
 	l.Xtrack = x.String()
 	l.Status = "init"
 	l.URL = c.Request.RequestURI

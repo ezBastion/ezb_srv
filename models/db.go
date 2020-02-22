@@ -28,7 +28,7 @@ import (
 
 	"github.com/ezbastion/ezb_srv/cache"
 
-	"github.com/go-resty/resty"
+	"github.com/go-resty/resty/v2"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -67,9 +67,10 @@ func GetViewApi(s cache.Storage, c *Configuration, token, xtrack string) ([]View
 			logg.Error("PublicCert:", c.PublicCert)
 			return vapisFiltred, err
 		}
-		resty.SetRootCertificate(path.Join(exPath, c.CaCert))
-		resty.SetCertificates(cert)
-		_, err = resty.R().
+		client := resty.New()
+		client.SetRootCertificate(path.Join(exPath, c.CaCert))
+		client.SetCertificates(cert)
+		_, err = client.R().
 			SetResult(&vapis).
 			Get(c.EzbDB + "accountactions")
 		if err != nil {
@@ -117,9 +118,10 @@ func GetApiPath(s cache.Storage, c *Configuration) (apiPath []ApiPath, err error
 			fmt.Println(err)
 			return apiPath, err
 		}
-		resty.SetRootCertificate(path.Join(exPath, c.CaCert))
-		resty.SetCertificates(cert)
-		_, err = resty.R().
+		client := resty.New()
+		client.SetRootCertificate(path.Join(exPath, c.CaCert))
+		client.SetCertificates(cert)
+		_, err = client.R().
 			SetResult(&apiPath).
 			Get(c.EzbDB + "api")
 		if err != nil {
@@ -155,9 +157,10 @@ func GetAction(s cache.Storage, c *Configuration, actionID int) (action EzbActio
 			fmt.Println(err)
 			return action, err
 		}
-		resty.SetRootCertificate(path.Join(exPath, c.CaCert))
-		resty.SetCertificates(cert)
-		_, err = resty.R().
+		client := resty.New()
+		client.SetRootCertificate(path.Join(exPath, c.CaCert))
+		client.SetCertificates(cert)
+		_, err = client.R().
 			SetResult(&action).
 			Get(fmt.Sprintf("%sactions/%d", c.EzbDB, actionID))
 		if err != nil {
@@ -193,9 +196,10 @@ func GetAccount(s cache.Storage, c *Configuration, userID string) (account EzbAc
 			fmt.Println(err)
 			return account, err
 		}
-		resty.SetRootCertificate(path.Join(exPath, c.CaCert))
-		resty.SetCertificates(cert)
-		_, err = resty.R().
+		client := resty.New()
+		client.SetRootCertificate(path.Join(exPath, c.CaCert))
+		client.SetCertificates(cert)
+		_, err = client.R().
 			SetResult(&account).
 			Get(fmt.Sprintf("%saccounts/%s", c.EzbDB, userID))
 		if err != nil {
@@ -232,9 +236,10 @@ func GetStas(s cache.Storage, c *Configuration) (stas []EzbStas, err error) {
 			fmt.Println(err)
 			return stas, err
 		}
-		resty.SetRootCertificate(path.Join(exPath, c.CaCert))
-		resty.SetCertificates(cert)
-		_, err = resty.R().
+		client := resty.New()
+		client.SetRootCertificate(path.Join(exPath, c.CaCert))
+		client.SetCertificates(cert)
+		_, err = client.R().
 			SetResult(&stas).
 			Get(fmt.Sprintf("%sstas", c.EzbDB))
 		if err != nil {
@@ -270,9 +275,10 @@ func GetWorkers(s cache.Storage, c *Configuration) (workers []EzbWorkers, err er
 			fmt.Println(err)
 			return workers, err
 		}
-		resty.SetRootCertificate(path.Join(exPath, c.CaCert))
-		resty.SetCertificates(cert)
-		_, err = resty.R().
+		client := resty.New()
+		client.SetRootCertificate(path.Join(exPath, c.CaCert))
+		client.SetCertificates(cert)
+		_, err = client.R().
 			SetResult(&workers).
 			Get(fmt.Sprintf("%sworkers", c.EzbDB))
 		if err != nil {

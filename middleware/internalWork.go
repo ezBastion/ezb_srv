@@ -25,7 +25,7 @@ import (
 	"github.com/ezbastion/ezb_srv/models"
 
 	"github.com/gin-gonic/gin"
-	"github.com/go-resty/resty"
+	"github.com/go-resty/resty/v2"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -127,7 +127,8 @@ func authorize(c *gin.Context, storage cache.Storage, conf *models.Configuration
 				return "", err
 			}
 			var respStruct map[string]interface{}
-			resp, err := resty.R().
+			client := resty.New()
+			resp, err := client.R().
 				SetHeader("Accept", "application/json").
 				SetHeader("X-Track", trace.Xtrack).
 				SetBody(&formauth).

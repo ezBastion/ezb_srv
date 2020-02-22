@@ -33,7 +33,7 @@ import (
 
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
-	"github.com/go-resty/resty"
+	"github.com/go-resty/resty/v2"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -126,7 +126,8 @@ func Introspection(c *gin.Context, sub string, Account models.EzbAccounts) (err 
 	Url, _ = url.Parse(Account.STA.EndPoint)
 	Url.Path = "/access"
 	var introspec Introspec
-	resp, err := resty.R().
+	client := resty.New()
+	resp, err := client.R().
 		SetHeader("Accept", "application/json").
 		SetHeader("Authorization", c.GetHeader("Authorization")).
 		SetResult(&introspec).
