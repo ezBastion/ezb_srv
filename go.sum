@@ -9,8 +9,6 @@ github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/dgrijalva/jwt-go v3.2.0+incompatible h1:7qlOGliEKZXTDg6OTjfoBKDXWrumCAMpl/TFQ4/5kLM=
 github.com/dgrijalva/jwt-go v3.2.0+incompatible/go.mod h1:E3ru+11k8xSBh+hMPgOLZmtrrCbhqsmaPHjLKYnJCaQ=
-github.com/ezbastion/ezb_lib v0.0.0-20200222105408-548e481d950a h1:ZhkBBtW7LpqUNYCXRFTpoTfEIMenM5urBiLQNJxcLjk=
-github.com/ezbastion/ezb_lib v0.0.0-20200222105408-548e481d950a/go.mod h1:ybKk609w7Gi4IRqUx9hDcNKIe/+DtfYuSHLgjYk2td8=
 github.com/ezbastion/ezb_lib v0.1.0 h1:eK0XuOXnAXOPXN/Xjn+HX4mKLgjJxY84Rf6w+5KaCkA=
 github.com/ezbastion/ezb_lib v0.1.0/go.mod h1:F6U708XN/ROG+xnFvOw6KcBR1RR5Ggvyr9YQGosdA9M=
 github.com/gin-contrib/location v0.0.1 h1:5ZtqDL5WA6YXNuT5nGp55K3QSqJMYIl+2d7Lnwh9SGA=

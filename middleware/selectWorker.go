@@ -19,7 +19,6 @@ import (
 	"errors"
 	"math/rand"
 	"net/http"
-	"sort"
 	"time"
 
 	"github.com/ezbastion/ezb_srv/models"
@@ -41,7 +40,7 @@ func SelectWorker(c *gin.Context) {
 	logg.Debug("start")
 
 	routeType, _ := c.MustGet("routeType").(string)
-	// routeType := rt.(string)
+
 	if routeType == "worker" {
 		ac, _ := c.Get("action")
 		action := ac.(models.EzbActions)
@@ -61,19 +60,20 @@ func SelectWorker(c *gin.Context) {
 			}
 			logg.Debug("one worker found: ", worker.Name, " (", worker.Comment, ")")
 			c.Set("worker", worker)
-			// c.Set("action", nil)
 
 			trace.Worker = worker.Name
 			c.Set("trace", trace)
 		}
 		if nbW > 1 {
 			var enableWorkers []models.EzbWorkers
-			var keys []int
+			//var keys []int
 			for _, w := range workers {
 				if w.Enable {
 					if checksumISok(w.Fqdn, action.Jobs.Path, action.Jobs.Checksum) {
 						enableWorkers = append(enableWorkers, w)
-						keys = append(keys, len(enableWorkers))
+						logg.Debug("append worker ", w.Name, " :", len(enableWorkers))
+
+						//keys = append(keys, len(enableWorkers))
 					}
 				}
 			}
@@ -82,40 +82,45 @@ func SelectWorker(c *gin.Context) {
 				c.AbortWithError(http.StatusServiceUnavailable, errors.New("#W0003"))
 				return
 			}
+			var worker models.EzbWorkers
+			if len(enableWorkers) == 1 {
+				worker = enableWorkers[0]
+			} else {
+				worker = enableWorkers[randomWorker(&enableWorkers)]
+			}
 			// switch on config worker algo
-			worker := enableWorkers[randomWorker(&enableWorkers)]
+
 			logg.Debug("found ", len(enableWorkers), " worker, select ", worker.Name, " random")
 			c.Set("worker", worker)
-			c.Set("action", nil)
 
 			trace.Worker = worker.Name
 			c.Set("trace", trace)
-			// tool.Trace(&trace, c)
 			c.Next()
 		}
 	}
 	c.Next()
 }
 
-func orderBYjobs(keys *[]int, workers *[]models.EzbWorkers) {
-	var nbj []int
-	for _, _ = range *workers {
-		var j int // w.fqdn /healthcheck/jobs -> j int  goroutine
-		nbj = append(nbj, j)
-	}
-	sort.Ints(nbj)
-	keys = &nbj
-
-}
-func orderBYload(keys *[]int, workers *[]models.EzbWorkers) {
-	sort.Ints(*keys)
-}
+//func orderBYjobs(keys *[]int, workers *[]models.EzbWorkers) {
+//	var nbj []int
+//	for _, _ = range *workers {
+//		var j int // w.fqdn /healthcheck/jobs -> j int  goroutine
+//		nbj = append(nbj, j)
+//	}
+//	sort.Ints(nbj)
+//	keys = &nbj
+//
+//}
+//func orderBYload(keys *[]int, workers *[]models.EzbWorkers) {
+//	sort.Ints(*keys)
+//}
 func randomWorker(workers *[]models.EzbWorkers) int {
 	return rand.Intn(len(*workers) - 1)
 }
-func orderBYroundrobin(keys *[]int, workers *[]models.EzbWorkers) {
-	sort.Ints(*keys)
-}
+
+//func orderBYroundrobin(keys *[]int, workers *[]models.EzbWorkers) {
+//	sort.Ints(*keys)
+//}
 
 func checksumISok(fqdn, path, checksum string) bool {
 	/*
