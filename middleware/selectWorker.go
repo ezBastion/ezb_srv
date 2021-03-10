@@ -82,12 +82,9 @@ func SelectWorker(c *gin.Context) {
 				c.AbortWithError(http.StatusServiceUnavailable, errors.New("#W0003"))
 				return
 			}
-			var worker models.EzbWorkers
-			if len(enableWorkers) == 1 {
-				worker = enableWorkers[0]
-			} else {
-				worker = enableWorkers[randomWorker(&enableWorkers)]
-			}
+
+			var	worker = enableWorkers[randomWorker(&enableWorkers)]
+
 			// switch on config worker algo
 
 			logg.Debug("found ", len(enableWorkers), " worker, select ", worker.Name, " random")
@@ -115,7 +112,12 @@ func SelectWorker(c *gin.Context) {
 //	sort.Ints(*keys)
 //}
 func randomWorker(workers *[]models.EzbWorkers) int {
-	return rand.Intn(len(*workers) - 1)
+	j := rand.Intn(len(*workers) )
+	if j < len(*workers) {
+		return j
+	} else {
+		return j -1
+	}
 }
 
 //func orderBYroundrobin(keys *[]int, workers *[]models.EzbWorkers) {
