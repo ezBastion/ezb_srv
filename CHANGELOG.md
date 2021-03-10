@@ -2,6 +2,8 @@
 
 **ATTN**: This project uses [semantic versioning](http://semver.org/).
 
+## 0.2.3 - 2021-03-10
+-Fix #7 last worker is never called
 ## 0.2.2 - 2021-03-08
 - Fix #5 select workers
 - Fix #6 disable workers
